@@ -12,6 +12,19 @@ const router = Router();
  *   post:
  *     summary: Registro de usuarios
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nombre, email, password]
+ *             properties:
+ *               nombre: { type: string }
+ *               email: { type: string }
+ *               password: { type: string }
+ *     responses:
+ *       201: { description: Usuario creado }
  */
 router.post('/register',
   [body('nombre').notEmpty(), body('email').isEmail(), body('password').isLength({ min: 6 })],
@@ -23,6 +36,18 @@ router.post('/register',
  *   post:
  *     summary: Inicio de sesión
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string }
+ *               password: { type: string }
+ *     responses:
+ *       200: { description: Login exitoso }
  */
 router.post('/login', [body('email').isEmail(), body('password').notEmpty()], validar, login);
 
@@ -32,6 +57,7 @@ router.post('/login', [body('email').isEmail(), body('password').notEmpty()], va
  *   post:
  *     summary: Cierre de sesión
  *     tags: [Auth]
+ *     security: [{ bearerAuth: [] }]
  */
 router.post('/logout', autenticar, logout);
 

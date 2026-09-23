@@ -2,33 +2,32 @@ const { Router } = require('express');
 const { body } = require('express-validator');
 const autenticar = require('../middlewares/auth');
 const validar = require('../middlewares/validate');
-const controlador = require('../controllers/PacientesController');
+const controlador = require('../controllers/DoctoresController');
 
 const router = Router();
-
 router.use(autenticar);
 
 const reglas = [
   body('nombre').notEmpty(),
   body('email').isEmail(),
+  body('especialidad').notEmpty(),
   body('telefono').notEmpty(),
-  body('fecha_nacimiento').isISO8601().toDate(),
 ];
 
 /**
  * @swagger
  * tags:
- *   name: Pacientes
- * /api/pacientes:
+ *   name: Doctores
+ * /api/doctores:
  *   get:
- *     summary: Listar pacientes
- *     tags: [Pacientes]
+ *     summary: Listar doctores
+ *     tags: [Doctores]
  *     security: [{ bearerAuth: [] }]
  *     responses:
- *       200: { description: Lista de pacientes }
+ *       200: { description: Lista de doctores }
  *   post:
- *     summary: Crear paciente
- *     tags: [Pacientes]
+ *     summary: Crear doctor
+ *     tags: [Doctores]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
@@ -36,19 +35,19 @@ const reglas = [
  *         application/json:
  *           schema:
  *             type: object
- *             required: [nombre, email, telefono, fecha_nacimiento]
+ *             required: [nombre, email, especialidad, telefono]
  *             properties:
  *               nombre: { type: string }
  *               email: { type: string }
+ *               especialidad: { type: string }
  *               telefono: { type: string }
- *               fecha_nacimiento: { type: string, format: date }
- *               historial_medico: { type: string }
+ *               cualificaciones: { type: string }
  *     responses:
- *       201: { description: Paciente creado }
- * /api/pacientes/{id}:
+ *       201: { description: Doctor creado }
+ * /api/doctores/{id}:
  *   get:
- *     summary: Obtener un paciente
- *     tags: [Pacientes]
+ *     summary: Obtener un doctor
+ *     tags: [Doctores]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -56,10 +55,10 @@ const reglas = [
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       200: { description: Paciente encontrado }
+ *       200: { description: Doctor encontrado }
  *   put:
- *     summary: Actualizar paciente
- *     tags: [Pacientes]
+ *     summary: Actualizar doctor
+ *     tags: [Doctores]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -75,14 +74,14 @@ const reglas = [
  *             properties:
  *               nombre: { type: string }
  *               email: { type: string }
+ *               especialidad: { type: string }
  *               telefono: { type: string }
- *               fecha_nacimiento: { type: string, format: date }
- *               historial_medico: { type: string }
+ *               cualificaciones: { type: string }
  *     responses:
- *       200: { description: Paciente actualizado }
+ *       200: { description: Doctor actualizado }
  *   delete:
- *     summary: Eliminar paciente
- *     tags: [Pacientes]
+ *     summary: Eliminar doctor
+ *     tags: [Doctores]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -90,7 +89,7 @@ const reglas = [
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       204: { description: Paciente eliminado }
+ *       204: { description: Doctor eliminado }
  */
 router.get('/', controlador.listar);
 router.get('/:id', controlador.obtener);

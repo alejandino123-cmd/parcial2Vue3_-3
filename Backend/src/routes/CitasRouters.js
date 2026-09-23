@@ -2,33 +2,31 @@ const { Router } = require('express');
 const { body } = require('express-validator');
 const autenticar = require('../middlewares/auth');
 const validar = require('../middlewares/validate');
-const controlador = require('../controllers/PacientesController');
+const controlador = require('../controllers/CitasController');
 
 const router = Router();
-
 router.use(autenticar);
 
 const reglas = [
-  body('nombre').notEmpty(),
-  body('email').isEmail(),
-  body('telefono').notEmpty(),
-  body('fecha_nacimiento').isISO8601().toDate(),
+  body('paciente_id').notEmpty().isMongoId(),
+  body('doctor_id').notEmpty().isMongoId(),
+  body('fecha_cita').isISO8601().toDate(),
 ];
 
 /**
  * @swagger
  * tags:
- *   name: Pacientes
- * /api/pacientes:
+ *   name: Citas
+ * /api/citas:
  *   get:
- *     summary: Listar pacientes
- *     tags: [Pacientes]
+ *     summary: Listar citas
+ *     tags: [Citas]
  *     security: [{ bearerAuth: [] }]
  *     responses:
- *       200: { description: Lista de pacientes }
+ *       200: { description: Lista de citas }
  *   post:
- *     summary: Crear paciente
- *     tags: [Pacientes]
+ *     summary: Crear cita
+ *     tags: [Citas]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
@@ -36,19 +34,20 @@ const reglas = [
  *         application/json:
  *           schema:
  *             type: object
- *             required: [nombre, email, telefono, fecha_nacimiento]
+ *             required: [paciente_id, doctor_id, fecha_cita]
  *             properties:
- *               nombre: { type: string }
- *               email: { type: string }
- *               telefono: { type: string }
- *               fecha_nacimiento: { type: string, format: date }
- *               historial_medico: { type: string }
+ *               paciente_id: { type: string }
+ *               doctor_id: { type: string }
+ *               fecha_cita: { type: string, format: date-time }
+ *               notas: { type: string }
  *     responses:
- *       201: { description: Paciente creado }
- * /api/pacientes/{id}:
+ *       201: { description: Cita creada }
+ *       422: { description: Fecha inválida }
+ *       409: { description: Choque de horario con el doctor }
+ * /api/citas/{id}:
  *   get:
- *     summary: Obtener un paciente
- *     tags: [Pacientes]
+ *     summary: Obtener una cita
+ *     tags: [Citas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -56,10 +55,10 @@ const reglas = [
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       200: { description: Paciente encontrado }
+ *       200: { description: Cita encontrada }
  *   put:
- *     summary: Actualizar paciente
- *     tags: [Pacientes]
+ *     summary: Actualizar cita
+ *     tags: [Citas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -73,16 +72,14 @@ const reglas = [
  *           schema:
  *             type: object
  *             properties:
- *               nombre: { type: string }
- *               email: { type: string }
- *               telefono: { type: string }
- *               fecha_nacimiento: { type: string, format: date }
- *               historial_medico: { type: string }
+ *               fecha_cita: { type: string, format: date-time }
+ *               estado: { type: string, enum: [pendiente, confirmada, cancelada, completada] }
+ *               notas: { type: string }
  *     responses:
- *       200: { description: Paciente actualizado }
+ *       200: { description: Cita actualizada }
  *   delete:
- *     summary: Eliminar paciente
- *     tags: [Pacientes]
+ *     summary: Eliminar cita
+ *     tags: [Citas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -90,12 +87,12 @@ const reglas = [
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       204: { description: Paciente eliminado }
+ *       204: { description: Cita eliminada }
  */
 router.get('/', controlador.listar);
 router.get('/:id', controlador.obtener);
 router.post('/', reglas, validar, controlador.crear);
-router.put('/:id', reglas, validar, controlador.actualizar);
+router.put('/:id', controlador.actualizar);
 router.delete('/:id', controlador.eliminar);
 
 module.exports = router;
